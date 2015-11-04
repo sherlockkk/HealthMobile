@@ -417,14 +417,14 @@ public class MainActivity extends Activity {
 
 	public InputStream getXml() throws Exception {
 
-		String httpUrl = "http://zrys.code8086.com/HealthMobile/update/upgrade.xml";// 服务器下存放apk信息的xml文件
+		String httpUrl = Config.UPDATE_URL;// 服务器下存放apk信息的xml文件
 		Log.i("cc", "--  getXml  Ready!!!  --");
 
 		HttpURLConnection conn = (HttpURLConnection) new URL(httpUrl)
 				.openConnection();
 
 		Log.i("cc", "--连接服务器中...--");
-		conn.setReadTimeout(10 * 1000); // 设置连接超时的时间
+		conn.setReadTimeout(5000); // 设置连接超时的时间
 		// conn.setRequestMethod("GET");
 		conn.connect(); // 开始连接
 		Log.i("cc", "--开始连接--");

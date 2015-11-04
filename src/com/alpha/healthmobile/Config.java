@@ -14,8 +14,9 @@ public class Config {
 	/*
 	 * http://www.atgn.cn/
 	 */
-	public static final String HOST_URL = "http://zrys.code8086.com/HealthMobile/www/index.html";
-
+	public static final String HOST_URL = "http://www.51zrys.com/HealthMobile/www/index.html";
+	// 更新url
+	public static final String UPDATE_URL = "http://www.51zrys.com/HealthMobile/update/upgrade.xml";
 	/* 下载包安装路径 */
 	public static final String savePath = "/sdcard/download/";
 
