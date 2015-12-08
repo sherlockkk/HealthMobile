@@ -24,6 +24,9 @@ public class Config {
 
 	public static final String SHARE_SUBJECT = "早日养生";
 	public static final String SHARE_TEXT = "欢迎下载早日养生APP，做人类身心健康的连接器";
-	public static final String SHARE_URL = "http://zrys.code8086.com/HealthMobile/update/HealthMobile.apk";
-
+	public static final String SHARE_URL = "http://www.51zrys.com/HealthMobile/update/HealthMobile.apk";
+	
+	//向服务器发送location数据的url
+	public static final String LOCATION_URL = "http://192.168.1.69:8080/Health/mobile/login!loginGeocoder.shtml";
+	public static String lnglat = "114.931981,25.842652";
 }

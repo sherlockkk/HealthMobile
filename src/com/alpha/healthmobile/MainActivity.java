@@ -135,6 +135,11 @@ public class MainActivity extends Activity {
 			Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse("tel:"
 					+ phoneCode));
 			startActivity(intent);
+		} // 如果target 大于等于API 17，则需要加上如下注解
+
+		@JavascriptInterface
+		public String lnglat() {
+			return Config.lnglat;
 		}
 
 		/**
