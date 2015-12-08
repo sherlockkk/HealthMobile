@@ -34,6 +34,17 @@ import android.webkit.WebViewClient;
 import android.widget.Toast;
 
 import com.igexin.sdk.PushManager;
+import com.umeng.socialize.bean.SHARE_MEDIA;
+import com.umeng.socialize.controller.UMServiceFactory;
+import com.umeng.socialize.controller.UMSocialService;
+import com.umeng.socialize.media.QQShareContent;
+import com.umeng.socialize.media.QZoneShareContent;
+import com.umeng.socialize.media.UMImage;
+import com.umeng.socialize.sso.QZoneSsoHandler;
+import com.umeng.socialize.sso.UMQQSsoHandler;
+import com.umeng.socialize.weixin.controller.UMWXHandler;
+import com.umeng.socialize.weixin.media.CircleShareContent;
+import com.umeng.socialize.weixin.media.WeiXinShareContent;
 
 public class MainActivity extends Activity {
 	private WebView mWebView;
@@ -42,6 +53,21 @@ public class MainActivity extends Activity {
 	long touchTime = 0;
 
 	UpdataInfo info = new UpdataInfo();
+
+	// 社会化分享
+	final UMSocialService mController = UMServiceFactory
+			.getUMSocialService("com.umeng.share");
+
+	// 设置分享内容
+	// mController.setShareContent("友盟社会化组件（SDK）让移动应用快速整合社交分享功能，http://www.umeng.com/social");
+	// 设置分享图片, 参数2为图片的url地址
+	// mController.setShareMedia(new UMImage(getActivity(),
+	// "http://www.umeng.com/images/pic/banner_module_social.png"));
+	// 设置分享图片，参数2为本地图片的资源引用
+	// mController.setShareMedia(new UMImage(getActivity(), R.drawable.icon));
+	// 设置分享图片，参数2为本地图片的路径(绝对路径)
+	// mController.setShareMedia(new UMImage(getActivity(),
+	// BitmapFactory.decodeFile("/mnt/sdcard/icon.png")));
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -147,20 +173,86 @@ public class MainActivity extends Activity {
 		 * 
 		 * @param view
 		 */
+
 		@JavascriptInterface
 		public void onClickShare() {
-			Intent intent = new Intent(Intent.ACTION_SEND);
-			// intent.setType("image/png");
-			// intent.putExtra(Intent.EXTRA_STREAM,
-			// "http://found520.bmob.cn/uploads/55d134f2dfb77.png");
-			intent.setType("text/plain");
-			intent.putExtra(Intent.EXTRA_SUBJECT, Config.SHARE_SUBJECT);
-			intent.putExtra(Intent.EXTRA_TEXT, Config.SHARE_TEXT
-					+ Config.SHARE_URL);
-			intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-			startActivity(Intent.createChooser(intent, "邀请好友"));
+			mController.openShare(MainActivity.this, false);
+			mController.getConfig().setPlatforms(SHARE_MEDIA.QQ,
+					SHARE_MEDIA.QZONE, SHARE_MEDIA.WEIXIN,
+					SHARE_MEDIA.WEIXIN_CIRCLE);
+			ssoConfig();
+			QZoneShareContent();
+			QQShareContent();
+			WXShareContent();
+			WXCircleShareContent();
 		}
 
+		/*
+		 * 各平台SSO免登陆配置
+		 */
+		private void ssoConfig() {
+			// TODO Auto-generated method stub
+			// 参数1为当前Activity，参数2为开发者在QQ互联申请的APP ID，参数3为开发者在QQ互联申请的APP kEY.
+			UMQQSsoHandler qqSsoHandler = new UMQQSsoHandler(MainActivity.this,
+					Config.QQ_APPID, Config.QQ_APPSECRET);
+			qqSsoHandler.addToSocialSDK();
+			// 参数1为当前Activity，参数2为开发者在QQ互联申请的APP ID，参数3为开发者在QQ互联申请的APP kEY.
+			QZoneSsoHandler qZoneSsoHandler = new QZoneSsoHandler(
+					MainActivity.this, Config.QQ_APPID, Config.QQ_APPSECRET);
+			qZoneSsoHandler.addToSocialSDK();
+			// 添加微信平台
+			UMWXHandler wxHandler = new UMWXHandler(MainActivity.this,
+					Config.WX_APPID, Config.WX_APPSECRET);
+			wxHandler.addToSocialSDK();
+			// 添加微信朋友圈
+			UMWXHandler wxCircleHandler = new UMWXHandler(MainActivity.this,
+					Config.WX_APPID, Config.WX_APPSECRET);
+			wxCircleHandler.setToCircle(true);
+			wxCircleHandler.addToSocialSDK();
+		}
+	}
+
+	private void QZoneShareContent() {
+		// TODO Auto-generated method stub
+		QZoneShareContent qzoneShare = new QZoneShareContent();
+		qzoneShare.setTargetUrl(Config.SHARE_URL);
+		qzoneShare.setShareContent(Config.SHARE_TEXT);
+		qzoneShare.setTitle(Config.SHARE_TITLE);
+		mController.setShareMedia(qzoneShare);
+	}
+
+	private void QQShareContent() {
+		// TODO Auto-generated method stub
+		QQShareContent qqShareContent = new QQShareContent();
+		qqShareContent.setShareContent(Config.SHARE_TEXT + Config.SHARE_URL);
+		qqShareContent.setTargetUrl(Config.SHARE_URL);
+		qqShareContent.setTitle(Config.SHARE_TITLE);
+		// qqShareContent.setShareImage(new UMImage(MainActivity.this,
+		// R.drawable.ic_launcher));
+		mController.setShareMedia(qqShareContent);
+	}
+
+	private void WXShareContent() {
+		// TODO Auto-generated method stub
+		WeiXinShareContent wxShareContent = new WeiXinShareContent();
+		wxShareContent.setShareContent(Config.SHARE_TEXT + Config.SHARE_URL);
+		wxShareContent.setTargetUrl(Config.SHARE_URL);
+		wxShareContent.setTitle(Config.SHARE_TITLE);
+		wxShareContent.setShareImage(new UMImage(MainActivity.this,
+				R.drawable.ic_launcher));
+		mController.setShareMedia(wxShareContent);
+	}
+
+	private void WXCircleShareContent() {
+		// TODO Auto-generated method stub
+		CircleShareContent wxCircleShareContent = new CircleShareContent();
+		wxCircleShareContent.setShareContent(Config.SHARE_TEXT
+				+ Config.SHARE_URL);
+		wxCircleShareContent.setTargetUrl(Config.SHARE_URL);
+		wxCircleShareContent.setTitle(Config.SHARE_TITLE);
+		wxCircleShareContent.setShareImage(new UMImage(MainActivity.this,
+				R.drawable.ic_launcher));
+		mController.setShareMedia(wxCircleShareContent);
 	}
 
 	private void init() {
