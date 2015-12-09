@@ -30,8 +30,8 @@ public class Config {
 	public static String lnglat = "114.931981,25.842652";
 
 	// appID,AppSecret
-	public static final String QQ_APPID = "1104911029";
-	public static final String QQ_APPSECRET = "4WVr2PMolD8UPpfw";
+	public static final String QQ_APPID = "1105010560";
+	public static final String QQ_APPKEY = "cgFIy0f3q9id72VT";
 	public static final String WX_APPID = "wx4fec9e44be45c0cd";
-	public static final String WX_APPSECRET = "d4624c36b6795d1d99dcf0547af5443d";
+	public static final String WX_APPSECRET = "56bcc38e1edaecdbe81c7671aa20e7d1";
 }

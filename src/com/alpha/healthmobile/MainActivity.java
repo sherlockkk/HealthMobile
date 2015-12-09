@@ -76,7 +76,8 @@ public class MainActivity extends Activity {
 
 		init();
 		initSetting();
-
+		mController.getConfig().setPlatforms(SHARE_MEDIA.QQ, SHARE_MEDIA.QZONE,
+				SHARE_MEDIA.WEIXIN, SHARE_MEDIA.WEIXIN_CIRCLE);
 		PushManager.getInstance().initialize(this.getApplicationContext());
 
 		new Thread() {
@@ -177,9 +178,6 @@ public class MainActivity extends Activity {
 		@JavascriptInterface
 		public void onClickShare() {
 			mController.openShare(MainActivity.this, false);
-			mController.getConfig().setPlatforms(SHARE_MEDIA.QQ,
-					SHARE_MEDIA.QZONE, SHARE_MEDIA.WEIXIN,
-					SHARE_MEDIA.WEIXIN_CIRCLE);
 			ssoConfig();
 			QZoneShareContent();
 			QQShareContent();
@@ -194,11 +192,11 @@ public class MainActivity extends Activity {
 			// TODO Auto-generated method stub
 			// 参数1为当前Activity，参数2为开发者在QQ互联申请的APP ID，参数3为开发者在QQ互联申请的APP kEY.
 			UMQQSsoHandler qqSsoHandler = new UMQQSsoHandler(MainActivity.this,
-					Config.QQ_APPID, Config.QQ_APPSECRET);
+					Config.QQ_APPID, Config.QQ_APPKEY);
 			qqSsoHandler.addToSocialSDK();
 			// 参数1为当前Activity，参数2为开发者在QQ互联申请的APP ID，参数3为开发者在QQ互联申请的APP kEY.
 			QZoneSsoHandler qZoneSsoHandler = new QZoneSsoHandler(
-					MainActivity.this, Config.QQ_APPID, Config.QQ_APPSECRET);
+					MainActivity.this, Config.QQ_APPID, Config.QQ_APPKEY);
 			qZoneSsoHandler.addToSocialSDK();
 			// 添加微信平台
 			UMWXHandler wxHandler = new UMWXHandler(MainActivity.this,
