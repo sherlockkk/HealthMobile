@@ -1,8 +1,10 @@
 package com.alpha.healthmobile;
 
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLEncoder;
 
 import org.xmlpull.v1.XmlPullParser;
 
@@ -17,6 +19,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.text.TextUtils;
 import android.util.Log;
 import android.util.Xml;
 import android.view.KeyEvent;
@@ -33,6 +36,9 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Toast;
 
+import com.alipay.sdk.app.PayTask;
+import com.alpha.healthmobile.alipay.AliPay;
+import com.alpha.healthmobile.alipay.PayResult;
 import com.igexin.sdk.PushManager;
 import com.umeng.socialize.bean.SHARE_MEDIA;
 import com.umeng.socialize.controller.UMServiceFactory;
@@ -47,8 +53,10 @@ import com.umeng.socialize.weixin.media.CircleShareContent;
 import com.umeng.socialize.weixin.media.WeiXinShareContent;
 
 public class MainActivity extends Activity {
-	private WebView mWebView;
 
+	private static final int SDK_PAY_FLAG = 1; // 支付
+
+	private WebView mWebView;
 	long waitTime = 2000;
 	long touchTime = 0;
 
@@ -122,8 +130,8 @@ public class MainActivity extends Activity {
 		mWebView.addJavascriptInterface(new WebAppInterface(this),
 				"myInterfaceName");
 
-		// mWebView.loadUrl(web_url);
-		mWebView.loadUrl(Config.HOST_URL);
+		mWebView.loadUrl(Config.TEST_URL);
+		// mWebView.loadUrl(Config.HOST_URL);
 	}
 
 	// 调用获得和解析xml的方法，（异步或线程中操作）；
@@ -147,6 +155,7 @@ public class MainActivity extends Activity {
 	 * @author 1
 	 * 
 	 */
+
 	public class WebAppInterface {
 		Context mContext;
 
@@ -168,6 +177,77 @@ public class MainActivity extends Activity {
 		public String lnglat() {
 			return Config.lnglat;
 		}
+
+		/**
+		 * 支付宝支付
+		 */
+
+		@JavascriptInterface
+		public void Alipay(String subject, String body, String price) {
+			AliPay aliPay = new AliPay();
+			String orderInfo = aliPay.getOrderInfo(subject, body, price);
+			String sign = aliPay.sign(orderInfo);
+			try {
+				sign = URLEncoder.encode(sign, "UTF-8");
+			} catch (UnsupportedEncodingException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			// 注意：这里的订单信息一定要符合支付宝规范，否则会支付失败，
+			// 具体规范参考支付宝官方开发文档
+			// http://doc.open.alipay.com/doc2/detail.htm?spm=0.0.0.0.E3Jb4k&treeId=59&articleId=103663&docType=1
+			final String payInfo = orderInfo + "&sign=\"" + sign + "\"&"
+					+ aliPay.getSignType();
+			Runnable runnable = new Runnable() {
+				@Override
+				public void run() {
+					// TODO Auto-generated method stub
+					PayTask alipayPayTask = new PayTask(MainActivity.this);
+					String result = alipayPayTask.pay(payInfo);
+					Log.i("cc", "返回的结果为：" + result);
+					Message msg = new Message();
+					msg.what = SDK_PAY_FLAG;
+					msg.obj = result;
+					payHandler.sendMessage(msg);
+				}
+			};
+			// 必须异步调用
+			Thread payThread = new Thread(runnable);
+			payThread.start();
+		}
+
+		/**
+		 * 判断支付状态
+		 */
+		Handler payHandler = new Handler() {
+			public void handleMessage(Message msg) {
+				switch (msg.what) {
+				case SDK_PAY_FLAG:
+					PayResult payResult = new PayResult((String) msg.obj);
+					String resultInfo = payResult.getResult();
+					String resultStatus = payResult.getResultStatus();
+					// 判断resultStatus为“9000”则表示支付成功
+					if (TextUtils.equals(resultStatus, "9000")) {
+						Toast.makeText(MainActivity.this, "支付成功",
+								Toast.LENGTH_SHORT).show();
+						mWebView.loadUrl(Config.TEST_URL);
+					} else {
+						if (TextUtils.equals(resultStatus, "8000")) {
+							Toast.makeText(MainActivity.this, "支付结果确认中...",
+									Toast.LENGTH_SHORT).show();
+						} else {
+							Toast.makeText(MainActivity.this, "支付失败，请重试",
+									Toast.LENGTH_SHORT).show();
+							mWebView.goBack();
+						}
+					}
+					break;
+
+				default:
+					break;
+				}
+			}
+		};
 
 		/**
 		 * 分享

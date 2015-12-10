@@ -209,7 +209,17 @@
             android:name="UMENG_APPKEY"
             android:value="5666776ee0f55a21c8001e56" >
         </meta-data>
+<!-- ###################添加AliPayActivity开始###################### -->
 
+<activity 
+    android:name="com.alipay.sdk.app.H5PayActivity"
+    android:configChanges="orientation|keyboardHidden|navigation"
+    android:exported="false"
+    android:screenOrientation="behind"
+    android:windowSoftInputMode="adjustResize|stateHidden"
+    ></activity>
+
+<!-- ###################添加AliPayActivity结束###################### -->
     </application>
 
    <!-- 友盟社会化分享权限配置开始 -->
