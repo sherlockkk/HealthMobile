@@ -54,7 +54,8 @@ import com.umeng.socialize.weixin.media.WeiXinShareContent;
 
 public class MainActivity extends Activity {
 
-	private static final int SDK_PAY_FLAG = 1; // 支付
+	private static final int SDK_PAY_FLAG = 1; // 支付宝支付旗标
+	public static Handler weixinPayHandler;
 
 	private WebView mWebView;
 	long waitTime = 2000;
@@ -180,6 +181,13 @@ public class MainActivity extends Activity {
 
 		/**
 		 * 支付宝支付
+		 * 
+		 * @param subject
+		 *            订单主题，对商品或支付单的简要描述
+		 * @param body
+		 *            商品详情描述
+		 * @param price
+		 *            订单金额
 		 */
 
 		@JavascriptInterface
@@ -248,6 +256,18 @@ public class MainActivity extends Activity {
 				}
 			}
 		};
+
+		/**
+		 * 微信支付
+		 * 
+		 * @param subject
+		 * @param body
+		 * @param price
+		 */
+		@JavascriptInterface
+		public void WeiXinPay(String subject, String body, String price) {
+
+		}
 
 		/**
 		 * 分享

@@ -573,6 +573,7 @@ int menu main 0x7f0a0000
 int raw shake_sound 0x7f050000
 int string action_settings 0x7f060075
 int string app_name 0x7f060074
+int string app_tip 0x7f060077
 int string com_facebook_dialogloginactivity_ok_button 0x7f060011
 int string com_facebook_image_download_unknown_error 0x7f06000d
 int string com_facebook_internet_permission_error_message 0x7f06000b
@@ -600,6 +601,7 @@ int string flickr_showword 0x7f060015
 int string foursquare_content 0x7f06001b
 int string foursquare_no_client 0x7f06001a
 int string foursquare_showword 0x7f060019
+int string getting_prepayid 0x7f060078
 int string hello_world 0x7f060076
 int string kakao_content 0x7f06001e
 int string kakao_no_client 0x7f06001d

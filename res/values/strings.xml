@@ -4,5 +4,7 @@
     <string name="app_name">早日养生</string>
     <string name="action_settings">Settings</string>
     <string name="hello_world">Hello world!</string>
+    <string name="app_tip">提示</string>
+    <string name="getting_prepayid">正在获取预支付订单...</string>
 
 </resources>

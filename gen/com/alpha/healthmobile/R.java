@@ -717,6 +717,7 @@ containing a value of this type.
     public static final class string {
         public static final int action_settings=0x7f060075;
         public static final int app_name=0x7f060074;
+        public static final int app_tip=0x7f060077;
         public static final int com_facebook_dialogloginactivity_ok_button=0x7f060011;
         public static final int com_facebook_image_download_unknown_error=0x7f06000d;
         public static final int com_facebook_internet_permission_error_message=0x7f06000b;
@@ -744,6 +745,7 @@ containing a value of this type.
         public static final int foursquare_content=0x7f06001b;
         public static final int foursquare_no_client=0x7f06001a;
         public static final int foursquare_showword=0x7f060019;
+        public static final int getting_prepayid=0x7f060078;
         public static final int hello_world=0x7f060076;
         public static final int kakao_content=0x7f06001e;
         public static final int kakao_no_client=0x7f06001d;
