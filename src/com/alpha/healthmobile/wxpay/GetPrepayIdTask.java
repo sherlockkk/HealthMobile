@@ -17,10 +17,12 @@ import org.xmlpull.v1.XmlPullParserException;
 
 import android.app.ProgressDialog;
 import android.os.AsyncTask;
+import android.os.Bundle;
 import android.os.Message;
 import android.util.Log;
 import android.util.Xml;
 
+import com.alpha.healthmobile.MainActivity;
 import com.alpha.healthmobile.utils.GetPhoneHostIp;
 import com.alpha.healthmobile.utils.HttpWxUtil;
 import com.tencent.mm.sdk.modelpay.PayReq;
@@ -32,7 +34,7 @@ import com.tencent.mm.sdk.modelpay.PayReq;
  * @parameter
  * @return
  */
-class GetPrepayIdTask extends AsyncTask<Void, Void, Map<String, String>> {
+public class GetPrepayIdTask extends AsyncTask<Void, Void, Map<String, String>> {
 	/**
 	 * 
 	 */
@@ -79,11 +81,18 @@ class GetPrepayIdTask extends AsyncTask<Void, Void, Map<String, String>> {
 		if (result.get("result_code").equals("SUCCESS")) {
 			Log.e("orion-result_code-->", "IS SUCCESS!");
 			genPayReq();
+		}
+		if (result.get("return_code").equals("FAIL")) {
+			Message msg = new Message();
+			Bundle bundle = new Bundle();
+			bundle.putString("return_msg", result.get("return_code"));
+			msg.what = -1;
+			MainActivity.weixinPayHandler.sendMessage(msg);
 		} else {
 			Message msg = new Message();
-			msg.obj = result.get("result_code");
+			// msg.obj = result.get("result_code");
 			msg.what = 800;
-			// MainActivity.handler.sendMessage(msg);
+			MainActivity.weixinPayHandler.sendMessage(msg);
 		}
 	}
 

@@ -57,35 +57,30 @@ import com.umeng.socialize.weixin.media.WeiXinShareContent;
 public class MainActivity extends Activity {
 	private static Context mContext;
 	private static final int SDK_PAY_FLAG = 1; // 支付宝支付旗标
-	public static Handler weixinPayHandler = new Handler(
-			new Handler.Callback() {
-
-				@Override
-				public boolean handleMessage(Message msg) {
-					// TODO Auto-generated method stub
-					switch (msg.what) {
-					case 800:
-						Toast.makeText(mContext, "商户订单号重复", Toast.LENGTH_SHORT)
-								.show();
-						break;
-					case 0:
-						Toast.makeText(mContext, "支付成功", Toast.LENGTH_SHORT)
-								.show();
-						break;
-					case -1:
-						Toast.makeText(mContext, "支付失败", Toast.LENGTH_SHORT)
-								.show();
-						break;
-					case -2:
-						Toast.makeText(mContext, "支付取消", Toast.LENGTH_SHORT)
-								.show();
-						break;
-					default:
-						break;
-					}
-					return false;
-				}
-			});
+	public static Handler weixinPayHandler = new Handler() {
+		public void handleMessage(Message msg) {
+			switch (msg.what) {
+			case 800:
+				Toast.makeText(mContext, "商户订单号重复", Toast.LENGTH_SHORT).show();
+				break;
+			case 0:
+				Toast.makeText(mContext, "支付成功", Toast.LENGTH_SHORT).show();
+				break;
+			case -1:
+				Bundle bundle = new Bundle();
+				bundle = msg.getData();
+				String tip = bundle.getString("return_msg");
+				Toast.makeText(mContext, "支付失败" + "		" + tip,
+						Toast.LENGTH_SHORT).show();
+				break;
+			case -2:
+				Toast.makeText(mContext, "支付取消", Toast.LENGTH_SHORT).show();
+				break;
+			default:
+				break;
+			}
+		};
+	};
 
 	private WebView mWebView;
 	long waitTime = 2000;
@@ -644,8 +639,6 @@ public class MainActivity extends Activity {
 	public InputStream getXml() throws Exception {
 
 		String httpUrl = Config.UPDATE_URL;// 服务器下存放apk信息的xml文件
-		Log.i("cc", "--  getXml  Ready!!!  --");
-
 		HttpURLConnection conn = (HttpURLConnection) new URL(httpUrl)
 				.openConnection();
 

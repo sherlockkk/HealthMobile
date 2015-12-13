@@ -50,6 +50,10 @@
         <activity
             android:name="com.alpha.healthmobile.MainActivity"
             android:screenOrientation="portrait" >
+            <intent-filter >
+                <!-- scheme的值即为微信支付的appId -->
+                <data android:scheme=""/>
+            </intent-filter>
         </activity>
 
         <!-- 个推SDK配置开始 -->

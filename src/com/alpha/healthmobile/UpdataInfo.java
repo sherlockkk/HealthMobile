@@ -1,6 +1,5 @@
 package com.alpha.healthmobile;
 
-import android.util.Log;
 
 public class UpdataInfo {
 
@@ -9,13 +8,11 @@ public class UpdataInfo {
 	private static String about;
 
 	public int getVersion() {
-		Log.i("cc", "--getVersion--");
 		return version;
 
 	}
 
 	public void setVersion(int version) {
-		Log.i("cc", "--setVersion--");
 		this.version = version;
 	}
 
