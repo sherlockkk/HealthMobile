@@ -39,6 +39,8 @@ import android.widget.Toast;
 import com.alipay.sdk.app.PayTask;
 import com.alpha.healthmobile.alipay.AliPay;
 import com.alpha.healthmobile.alipay.PayResult;
+import com.alpha.healthmobile.wxpay.Constants;
+import com.alpha.healthmobile.wxpay.WXPay;
 import com.igexin.sdk.PushManager;
 import com.umeng.socialize.bean.SHARE_MEDIA;
 import com.umeng.socialize.controller.UMServiceFactory;
@@ -53,9 +55,37 @@ import com.umeng.socialize.weixin.media.CircleShareContent;
 import com.umeng.socialize.weixin.media.WeiXinShareContent;
 
 public class MainActivity extends Activity {
-
+	private static Context mContext;
 	private static final int SDK_PAY_FLAG = 1; // 支付宝支付旗标
-	public static Handler weixinPayHandler;
+	public static Handler weixinPayHandler = new Handler(
+			new Handler.Callback() {
+
+				@Override
+				public boolean handleMessage(Message msg) {
+					// TODO Auto-generated method stub
+					switch (msg.what) {
+					case 800:
+						Toast.makeText(mContext, "商户订单号重复", Toast.LENGTH_SHORT)
+								.show();
+						break;
+					case 0:
+						Toast.makeText(mContext, "支付成功", Toast.LENGTH_SHORT)
+								.show();
+						break;
+					case -1:
+						Toast.makeText(mContext, "支付失败", Toast.LENGTH_SHORT)
+								.show();
+						break;
+					case -2:
+						Toast.makeText(mContext, "支付取消", Toast.LENGTH_SHORT)
+								.show();
+						break;
+					default:
+						break;
+					}
+					return false;
+				}
+			});
 
 	private WebView mWebView;
 	long waitTime = 2000;
@@ -82,7 +112,7 @@ public class MainActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-
+		mContext = this;
 		init();
 		initSetting();
 		mController.getConfig().setPlatforms(SHARE_MEDIA.QQ, SHARE_MEDIA.QZONE,
@@ -225,7 +255,7 @@ public class MainActivity extends Activity {
 		}
 
 		/**
-		 * 判断支付状态
+		 * 判断支付宝支付状态
 		 */
 		Handler payHandler = new Handler() {
 			public void handleMessage(Message msg) {
@@ -266,7 +296,8 @@ public class MainActivity extends Activity {
 		 */
 		@JavascriptInterface
 		public void WeiXinPay(String subject, String body, String price) {
-
+			WXPay.getInstance(mContext, price, Constants.NOTIFY_URL, subject)
+					.doPay();
 		}
 
 		/**
