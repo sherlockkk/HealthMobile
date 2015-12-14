@@ -81,6 +81,9 @@ public class GetPrepayIdTask extends AsyncTask<Void, Void, Map<String, String>> 
 		if (result.get("result_code").equals("SUCCESS")) {
 			Log.e("orion-result_code-->", "IS SUCCESS!");
 			genPayReq();
+			Message msg = MainActivity.weixinPayHandler.obtainMessage();
+			msg.what = 0;
+			MainActivity.weixinPayHandler.sendMessage(msg);
 		}
 		if (result.get("return_code").equals("FAIL")) {
 			Message msg = new Message();
