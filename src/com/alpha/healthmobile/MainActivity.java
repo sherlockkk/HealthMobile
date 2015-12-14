@@ -61,6 +61,7 @@ public class MainActivity extends Activity {
 		public void handleMessage(Message msg) {
 			switch (msg.what) {
 			case 800:
+				//
 				Toast.makeText(mContext, "商户订单号重复", Toast.LENGTH_SHORT).show();
 				break;
 			case 0:
