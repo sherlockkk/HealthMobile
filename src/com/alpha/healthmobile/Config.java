@@ -16,7 +16,7 @@ public class Config {
 	 */
 
 	// ²âÊÔurl
-	public static final String TEST_URL = "http://192.168.1.100:8080/HealthMobile/www/index.html";
+	public static final String TEST_URL = "http://192.168.1.101:8080/HealthMobile/www/index.html";
 
 	public static final String HOST_URL = "http://www.51zrys.com/HealthMobile/www/index.html";
 	// ¸üÐÂurl

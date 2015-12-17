@@ -11,7 +11,7 @@ public class AliPay {
 	 * create the order info. 创建订单信息
 	 * 
 	 */
-	public String getOrderInfo(String subject, String body, String price) {
+	public String getOrderInfo(String subject, String price) {
 
 		// 签约合作者身份ID
 		String orderInfo = "partner=" + "\"" + Keys.PARTNER + "\"";
@@ -26,7 +26,7 @@ public class AliPay {
 		orderInfo += "&subject=" + "\"" + subject + "\"";
 
 		// 商品详情
-		orderInfo += "&body=" + "\"" + body + "\"";
+		// orderInfo += "&body=" + "\"" + body + "\"";
 
 		// 商品金额
 		orderInfo += "&total_fee=" + "\"" + price + "\"";
@@ -55,7 +55,7 @@ public class AliPay {
 		// orderInfo += "&extern_token=" + "\"" + extern_token + "\"";
 
 		// 支付宝处理完请求后，当前页面跳转到商户指定页面的路径，可空
-		orderInfo += "&return_url=\"m.alipay.com\"";
+		// orderInfo += "&return_url=\"m.alipay.com\"";
 
 		// 调用银行卡支付，需配置此参数，参与签名， 固定值 （需要签约《无线银行卡快捷支付》才能使用）
 		// orderInfo += "&paymethod=\"expressGateway\"";

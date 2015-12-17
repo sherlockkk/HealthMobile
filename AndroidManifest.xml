@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.alpha.healthmobile"
-    android:versionCode="8"
-    android:versionName="1.1.3" >
+    android:versionCode="9"
+    android:versionName="1.1.4" >
 
     <uses-sdk
         android:minSdkVersion="8"
@@ -52,7 +52,7 @@
             android:screenOrientation="portrait" >
             <intent-filter >
                 <!-- scheme的值即为微信支付的appId -->
-                <data android:scheme=""/>
+                <data android:scheme="wx4fec9e44be45c0cd"/>
             </intent-filter>
         </activity>
 

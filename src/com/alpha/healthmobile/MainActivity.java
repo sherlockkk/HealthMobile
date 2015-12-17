@@ -217,9 +217,9 @@ public class MainActivity extends Activity {
 		 */
 
 		@JavascriptInterface
-		public void Alipay(String subject, String body, String price) {
+		public void Alipay(String subject, String price) {
 			AliPay aliPay = new AliPay();
-			String orderInfo = aliPay.getOrderInfo(subject, body, price);
+			String orderInfo = aliPay.getOrderInfo(subject, price);
 			String sign = aliPay.sign(orderInfo);
 			try {
 				sign = URLEncoder.encode(sign, "UTF-8");
@@ -291,7 +291,9 @@ public class MainActivity extends Activity {
 		 * @param price
 		 */
 		@JavascriptInterface
-		public void WeiXinPay(String subject, String body, String price) {
+		public void WeiXinPay(String subject, String price) {
+			// IWXAPI weixinIwxapi = null;
+			// weixinIwxapi.registerApp(Constants.APP_ID);
 			WXPay.getInstance(mContext, price, Constants.NOTIFY_URL, subject)
 					.doPay();
 		}
