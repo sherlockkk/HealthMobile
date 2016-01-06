@@ -55,6 +55,19 @@
                 <data android:scheme="wx4fec9e44be45c0cd"/>
             </intent-filter>
         </activity>
+        
+        <activity
+            android:name="com.alpha.healthmobile.wxapi.WXPayEntryActivity"
+            android:label="@string/app_name"
+            android:screenOrientation="portrait"
+            android:exported="true"
+            android:launchMode="singleTop">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <data android:scheme="wx4fec9e44be45c0cd"/> <!-- 需修改 -->
+            </intent-filter>
+        </activity>
 
         <!-- 个推SDK配置开始 -->
         <!-- 配置的第三方参数属性 -->

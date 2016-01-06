@@ -5,6 +5,8 @@ import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.util.Map;
+import java.util.Random;
 
 import org.xmlpull.v1.XmlPullParser;
 
@@ -40,11 +42,18 @@ import com.alipay.sdk.app.PayTask;
 import com.alpha.healthmobile.alipay.AliPay;
 import com.alpha.healthmobile.alipay.PayResult;
 import com.alpha.healthmobile.wxpay.Constants;
-import com.alpha.healthmobile.wxpay.WXPay;
+import com.alpha.healthmobile.wxpay.MD5;
+import com.alpha.healthmobile.wxpay.OrderDetail;
+import com.alpha.healthmobile.wxpay.WxPayUtile;
 import com.igexin.sdk.PushManager;
+import com.tencent.mm.sdk.openapi.IWXAPI;
+import com.tencent.mm.sdk.openapi.WXAPIFactory;
 import com.umeng.socialize.bean.SHARE_MEDIA;
 import com.umeng.socialize.controller.UMServiceFactory;
 import com.umeng.socialize.controller.UMSocialService;
+import com.umeng.socialize.controller.listener.SocializeListeners.UMAuthListener;
+import com.umeng.socialize.controller.listener.SocializeListeners.UMDataListener;
+import com.umeng.socialize.exception.SocializeException;
 import com.umeng.socialize.media.QQShareContent;
 import com.umeng.socialize.media.QZoneShareContent;
 import com.umeng.socialize.media.UMImage;
@@ -57,41 +66,19 @@ import com.umeng.socialize.weixin.media.WeiXinShareContent;
 public class MainActivity extends Activity {
 	private static Context mContext;
 	private static final int SDK_PAY_FLAG = 1; // 支付宝支付旗标
-	public static Handler weixinPayHandler = new Handler() {
-		public void handleMessage(Message msg) {
-			switch (msg.what) {
-			case 800:
-				//
-				Toast.makeText(mContext, "商户订单号重复", Toast.LENGTH_SHORT).show();
-				break;
-			case 0:
-				Toast.makeText(mContext, "支付成功", Toast.LENGTH_SHORT).show();
-				break;
-			case -1:
-				Bundle bundle = new Bundle();
-				bundle = msg.getData();
-				String tip = bundle.getString("return_msg");
-				Toast.makeText(mContext, "支付失败" + "		" + tip,
-						Toast.LENGTH_SHORT).show();
-				break;
-			case -2:
-				Toast.makeText(mContext, "支付取消", Toast.LENGTH_SHORT).show();
-				break;
-			default:
-				break;
-			}
-		};
-	};
 
+	private IWXAPI api;
+	private static String TAG = "WXPay";
 	private WebView mWebView;
 	long waitTime = 2000;
 	long touchTime = 0;
 
+	OrderDetail orderDetail = new OrderDetail();
 	UpdataInfo info = new UpdataInfo();
 
 	// 社会化分享
 	final UMSocialService mController = UMServiceFactory
-			.getUMSocialService("com.umeng.share");
+			.getUMSocialService(Config.DESCRIPTOR);
 
 	// 设置分享内容
 	// mController.setShareContent("友盟社会化组件（SDK）让移动应用快速整合社交分享功能，http://www.umeng.com/social");
@@ -111,6 +98,7 @@ public class MainActivity extends Activity {
 		mContext = this;
 		init();
 		initSetting();
+		ssoConfig();
 		mController.getConfig().setPlatforms(SHARE_MEDIA.QQ, SHARE_MEDIA.QZONE,
 				SHARE_MEDIA.WEIXIN, SHARE_MEDIA.WEIXIN_CIRCLE);
 		PushManager.getInstance().initialize(this.getApplicationContext());
@@ -159,6 +147,30 @@ public class MainActivity extends Activity {
 
 		mWebView.loadUrl(Config.TEST_URL);
 		// mWebView.loadUrl(Config.HOST_URL);
+	}
+
+	/*
+	 * 各平台SSO免登陆配置
+	 */
+	private void ssoConfig() {
+		// TODO Auto-generated method stub
+		// 参数1为当前Activity，参数2为开发者在QQ互联申请的APP ID，参数3为开发者在QQ互联申请的APP kEY.
+		UMQQSsoHandler qqSsoHandler = new UMQQSsoHandler(MainActivity.this,
+				Config.QQ_APPID, Config.QQ_APPKEY);
+		qqSsoHandler.addToSocialSDK();
+		// 参数1为当前Activity，参数2为开发者在QQ互联申请的APP ID，参数3为开发者在QQ互联申请的APP kEY.
+		QZoneSsoHandler qZoneSsoHandler = new QZoneSsoHandler(
+				MainActivity.this, Config.QQ_APPID, Config.QQ_APPKEY);
+		qZoneSsoHandler.addToSocialSDK();
+		// 添加微信平台
+		UMWXHandler wxHandler = new UMWXHandler(MainActivity.this,
+				Config.WX_APPID, Config.WX_APPSECRET);
+		wxHandler.addToSocialSDK();
+		// 添加微信朋友圈
+		UMWXHandler wxCircleHandler = new UMWXHandler(MainActivity.this,
+				Config.WX_APPID, Config.WX_APPSECRET);
+		wxCircleHandler.setToCircle(true);
+		wxCircleHandler.addToSocialSDK();
 	}
 
 	// 调用获得和解析xml的方法，（异步或线程中操作）；
@@ -292,10 +304,111 @@ public class MainActivity extends Activity {
 		 */
 		@JavascriptInterface
 		public void WeiXinPay(String subject, String price) {
-			// IWXAPI weixinIwxapi = null;
-			// weixinIwxapi.registerApp(Constants.APP_ID);
-			WXPay.getInstance(mContext, price, Constants.NOTIFY_URL, subject)
-					.doPay();
+			regWX();
+			orderDetail.setSubject(subject);
+			orderDetail.setPrice(price);
+			WxPayUtile.getInstance(MainActivity.this, "1",
+					Constants.NOTIFY_URL, "测试商品", genOutTradNo()).doPay();
+		}
+
+		/**
+		 * 将app注册到微信
+		 */
+		private void regWX() {
+			// TODO Auto-generated method stub
+			// 通过WXAPIFactory工厂，获取IWXAPI的实例
+			api = WXAPIFactory.createWXAPI(mContext, Constants.APP_ID, false);
+			api.registerApp(Constants.APP_ID);
+		}
+
+		/**
+		 * 第三方登陆JS接口方法
+		 * 
+		 */
+		@JavascriptInterface
+		public void login_QQ() {
+			Log.i("ccc", ">>>>>>>>>>>>>");
+			login(SHARE_MEDIA.QQ);
+		}
+
+		@JavascriptInterface
+		public void login_WX() {
+			login(SHARE_MEDIA.WEIXIN);
+		}
+
+		/**
+		 * 第三方登陆
+		 * 
+		 * @param platform
+		 */
+		private void login(SHARE_MEDIA platform) {
+			// TODO Auto-generated method stub
+			mController.doOauthVerify(MainActivity.this, platform,
+					new UMAuthListener() {
+
+						@Override
+						public void onStart(SHARE_MEDIA arg0) {
+							// TODO Auto-generated method stub
+							Toast.makeText(MainActivity.this, "正在跳转...",
+									Toast.LENGTH_SHORT).show();
+						}
+
+						@Override
+						public void onError(SocializeException arg0,
+								SHARE_MEDIA arg1) {
+							// TODO Auto-generated method stub
+
+						}
+
+						@Override
+						public void onComplete(Bundle value,
+								SHARE_MEDIA platform) {
+							// TODO Auto-generated method stub
+							Toast.makeText(MainActivity.this, "跳转成功",
+									Toast.LENGTH_SHORT).show();
+							String uid = value.getString("uid");
+							if (!TextUtils.isEmpty(uid)) {
+								getUserInfo(platform);
+							} else {
+								Toast.makeText(MainActivity.this, "授权失败",
+										Toast.LENGTH_SHORT).show();
+							}
+						}
+
+						@Override
+						public void onCancel(SHARE_MEDIA arg0) {
+							// TODO Auto-generated method stub
+
+						}
+					});
+		}
+
+		/**
+		 * 获取授权平台的用户信息
+		 * 
+		 * @param platform
+		 */
+		private void getUserInfo(SHARE_MEDIA platform) {
+			mController.getPlatformInfo(MainActivity.this, platform,
+					new UMDataListener() {
+
+						@Override
+						public void onStart() {
+							// TODO Auto-generated method stub
+
+						}
+
+						@Override
+						public void onComplete(int status,
+								Map<String, Object> info) {
+							// TODO Auto-generated method stub
+							if (info != null) {
+								Toast.makeText(MainActivity.this,
+										info.toString(), Toast.LENGTH_SHORT)
+										.show();
+							}
+						}
+					});
 		}
 
 		/**
@@ -314,29 +427,6 @@ public class MainActivity extends Activity {
 			WXCircleShareContent();
 		}
 
-		/*
-		 * 各平台SSO免登陆配置
-		 */
-		private void ssoConfig() {
-			// TODO Auto-generated method stub
-			// 参数1为当前Activity，参数2为开发者在QQ互联申请的APP ID，参数3为开发者在QQ互联申请的APP kEY.
-			UMQQSsoHandler qqSsoHandler = new UMQQSsoHandler(MainActivity.this,
-					Config.QQ_APPID, Config.QQ_APPKEY);
-			qqSsoHandler.addToSocialSDK();
-			// 参数1为当前Activity，参数2为开发者在QQ互联申请的APP ID，参数3为开发者在QQ互联申请的APP kEY.
-			QZoneSsoHandler qZoneSsoHandler = new QZoneSsoHandler(
-					MainActivity.this, Config.QQ_APPID, Config.QQ_APPKEY);
-			qZoneSsoHandler.addToSocialSDK();
-			// 添加微信平台
-			UMWXHandler wxHandler = new UMWXHandler(MainActivity.this,
-					Config.WX_APPID, Config.WX_APPSECRET);
-			wxHandler.addToSocialSDK();
-			// 添加微信朋友圈
-			UMWXHandler wxCircleHandler = new UMWXHandler(MainActivity.this,
-					Config.WX_APPID, Config.WX_APPSECRET);
-			wxCircleHandler.setToCircle(true);
-			wxCircleHandler.addToSocialSDK();
-		}
 	}
 
 	private void QZoneShareContent() {
@@ -661,6 +751,15 @@ public class MainActivity extends Activity {
 		conn.disconnect(); // 断开连接
 		return null;
 
+	}
+
+	/**
+	 * 注意：商户系统内部的订单号,32个字符内、可包含字母,确保在商户系统唯一
+	 */
+	private String genOutTradNo() {
+		Random random = new Random();
+		return MD5.getMessageDigest(String.valueOf(random.nextInt(10000))
+				.getBytes());
 	}
 
 }

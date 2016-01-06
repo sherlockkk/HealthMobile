@@ -16,7 +16,7 @@ public class Config {
 	 */
 
 	// 测试url
-	public static final String TEST_URL = "http://192.168.1.101:8080/HealthMobile/www/index.html";
+	public static final String TEST_URL = "http://192.168.1.102:8080/HealthMobile/www/index.html";
 
 	public static final String HOST_URL = "http://www.51zrys.com/HealthMobile/www/index.html";
 	// 更新url
@@ -32,6 +32,8 @@ public class Config {
 	// 向服务器发送location数据的url
 	public static final String LOCATION_URL = "http://192.168.1.69:8080/Health/mobile/login!loginGeocoder.shtml";
 	public static String lnglat = "114.931981,25.842652";
+
+	public static final String DESCRIPTOR = "com.umeng.share";
 
 	// 分享用appID,AppSecret
 	public static final String QQ_APPID = "1105010560";
