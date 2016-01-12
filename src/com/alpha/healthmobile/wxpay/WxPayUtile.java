@@ -40,6 +40,11 @@ public class WxPayUtile {
 
 	private static final String TAG = "MicroMsg.SDKSample.PayActivity";
 
+	public WxPayUtile() {
+		msgApi = WXAPIFactory.createWXAPI(context, null);
+		msgApi.registerApp(Constants.APP_ID);
+	}
+
 	public WxPayUtile(Context context, String total_fee, String notify_url,
 			String body, String outTradNo) {
 		super();
@@ -206,7 +211,6 @@ public class WxPayUtile {
 				case XmlPullParser.START_TAG:
 
 					if ("xml".equals(nodeName) == false) {
-						// 实例化student对象
 						xml.put(nodeName, parser.nextText());
 					}
 					break;
@@ -239,7 +243,7 @@ public class WxPayUtile {
 	 * 
 	 * @return
 	 */
-	private String genOutTradNo() {
+	public String genOutTradNo() {
 		// Random random = new Random();
 		// int time = (int) System.currentTimeMillis();
 		// return

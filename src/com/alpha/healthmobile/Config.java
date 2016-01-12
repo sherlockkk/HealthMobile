@@ -21,6 +21,9 @@ public class Config {
 	public static final String HOST_URL = "http://www.51zrys.com/HealthMobile/www/index.html";
 	// 更新url
 	public static final String UPDATE_URL = "http://www.51zrys.com/HealthMobile/update/upgrade.xml";
+	public static final String UPDATE_APP_CODE_URL = "http://www.51zrys.com/Health/mobile/androiddownload!getAndroidAPPVersionCode.shtml?name=HealthMobile";
+	// 新版本下载地址
+	public static final String APP_DOWNLOAD_URL = "http://www.51zrys.com/HealthMobile/update/HealthMobile.apk";
 	/* 下载包安装路径 */
 	public static final String savePath = "/sdcard/download/";
 
@@ -36,8 +39,11 @@ public class Config {
 	public static final String DESCRIPTOR = "com.umeng.share";
 
 	// 分享用appID,AppSecret
-	public static final String QQ_APPID = "1105010560";
-	public static final String QQ_APPKEY = "cgFIy0f3q9id72VT";
-	public static final String WX_APPID = "wx4fec9e44be45c0cd";
-	public static final String WX_APPSECRET = "56bcc38e1edaecdbe81c7671aa20e7d1";
+	public static final String QQ_APPID = "1104732813";
+	public static final String QQ_APPKEY = "HmLP4EKuQu7bqWbD";
+	public static final String WX_APPID = "wxd3c037fb929ddcf7";
+	public static final String WX_APPSECRET = "644fb2652c6b59843811b03da484a181";
+
+	// 订单号回调接口
+	public static final String TRADNO_SUBMIT = "http://www.51zrys.com/Health/mobile/single!updatepaystate.shtml?";
 }

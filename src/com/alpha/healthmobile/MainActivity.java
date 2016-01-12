@@ -5,9 +5,11 @@ import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
+import org.json.JSONObject;
 import org.xmlpull.v1.XmlPullParser;
 
 import android.app.Activity;
@@ -41,6 +43,7 @@ import android.widget.Toast;
 import com.alipay.sdk.app.PayTask;
 import com.alpha.healthmobile.alipay.AliPay;
 import com.alpha.healthmobile.alipay.PayResult;
+import com.alpha.healthmobile.utils.HttpUtil;
 import com.alpha.healthmobile.wxpay.Constants;
 import com.alpha.healthmobile.wxpay.MD5;
 import com.alpha.healthmobile.wxpay.OrderDetail;
@@ -99,6 +102,7 @@ public class MainActivity extends Activity {
 		init();
 		initSetting();
 		ssoConfig();
+
 		mController.getConfig().setPlatforms(SHARE_MEDIA.QQ, SHARE_MEDIA.QZONE,
 				SHARE_MEDIA.WEIXIN, SHARE_MEDIA.WEIXIN_CIRCLE);
 		PushManager.getInstance().initialize(this.getApplicationContext());
@@ -108,9 +112,20 @@ public class MainActivity extends Activity {
 			public void run() {
 				// 需要在线程执行的方法
 				try {
-					InputStream is = getXml(); // 获取xml内容
-					getUpdataInfo(is); // 调用解析方法
-					serverVersion = info.getVersion(); // 获得服务器版本
+					// InputStream is = getXml(); // 获取xml内容
+					InputStream is = getUpdateServerAppVersionCodeJson();
+					// getUpdataInfo(is); // 调用解析方法
+
+					byte[] buffer = new byte[1024];
+					System.out.println(">>>>>>>>>>开始读取更新数据");
+					int len = is.read(buffer);
+					String str = new String(buffer, 0, len);
+					JSONObject json = new JSONObject(str);
+
+					serverVersion = Integer.valueOf(json.getString("data"));
+					System.out.println("获取到了服务器上的版本为:" + serverVersion);
+
+					// serverVersion = info.getVersion(); // 获得服务器版本
 					Log.i("cc",
 							"check--infoVersion=" + info.getVersion()
 									+ "infoURL=" + info.getUrl() + "infoAbout="
@@ -145,8 +160,8 @@ public class MainActivity extends Activity {
 		mWebView.addJavascriptInterface(new WebAppInterface(this),
 				"myInterfaceName");
 
-		mWebView.loadUrl(Config.TEST_URL);
-		// mWebView.loadUrl(Config.HOST_URL);
+		// mWebView.loadUrl(Config.TEST_URL);
+		mWebView.loadUrl(Config.HOST_URL);
 	}
 
 	/*
@@ -212,6 +227,11 @@ public class MainActivity extends Activity {
 			startActivity(intent);
 		} // 如果target 大于等于API 17，则需要加上如下注解
 
+		/**
+		 * 经纬度获取
+		 * 
+		 * @return
+		 */
 		@JavascriptInterface
 		public String lnglat() {
 			return Config.lnglat;
@@ -227,11 +247,13 @@ public class MainActivity extends Activity {
 		 * @param price
 		 *            订单金额
 		 */
+		AliPay aliPay = new AliPay();
 
 		@JavascriptInterface
 		public void Alipay(String subject, String price) {
-			AliPay aliPay = new AliPay();
+
 			String orderInfo = aliPay.getOrderInfo(subject, price);
+
 			String sign = aliPay.sign(orderInfo);
 			try {
 				sign = URLEncoder.encode(sign, "UTF-8");
@@ -262,6 +284,18 @@ public class MainActivity extends Activity {
 			payThread.start();
 		}
 
+		private String getTradNo() {
+			// TODO Auto-generated method stub
+			return aliPay.getOutTradeNo();
+		}
+
+		public Map<String, String> getParams() {
+			Map<String, String> params = new HashMap<String, String>();
+			params.put("orderNo", getTradNo());
+			params.put("type", "AliPay");
+			return params;
+		}
+
 		/**
 		 * 判断支付宝支付状态
 		 */
@@ -274,9 +308,23 @@ public class MainActivity extends Activity {
 					String resultStatus = payResult.getResultStatus();
 					// 判断resultStatus为“9000”则表示支付成功
 					if (TextUtils.equals(resultStatus, "9000")) {
+						runOnUiThread(new Runnable() {
+
+							@Override
+							public void run() {
+								// TODO Auto-generated method stub
+								try {
+									HttpUtil.postMethon(Config.TRADNO_SUBMIT,
+											getParams());
+								} catch (Exception e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								}
+							}
+						});
 						Toast.makeText(MainActivity.this, "支付成功",
 								Toast.LENGTH_SHORT).show();
-						mWebView.loadUrl(Config.TEST_URL);
+						mWebView.loadUrl(Config.HOST_URL);
 					} else {
 						if (TextUtils.equals(resultStatus, "8000")) {
 							Toast.makeText(MainActivity.this, "支付结果确认中...",
@@ -307,8 +355,9 @@ public class MainActivity extends Activity {
 			regWX();
 			orderDetail.setSubject(subject);
 			orderDetail.setPrice(price);
-			WxPayUtile.getInstance(MainActivity.this, "1",
-					Constants.NOTIFY_URL, "测试商品", genOutTradNo()).doPay();
+			// price + "00"
+			WxPayUtile.getInstance(MainActivity.this, price + "00",
+					Constants.NOTIFY_URL, subject, genOutTradNo()).doPay();
 		}
 
 		/**
@@ -357,6 +406,7 @@ public class MainActivity extends Activity {
 						public void onError(SocializeException arg0,
 								SHARE_MEDIA arg1) {
 							// TODO Auto-generated method stub
+							Log.i("cc", arg0.toString());
 
 						}
 
@@ -366,6 +416,7 @@ public class MainActivity extends Activity {
 							// TODO Auto-generated method stub
 							Toast.makeText(MainActivity.this, "跳转成功",
 									Toast.LENGTH_SHORT).show();
+							System.out.println(value);
 							String uid = value.getString("uid");
 							if (!TextUtils.isEmpty(uid)) {
 								getUserInfo(platform);
@@ -403,6 +454,7 @@ public class MainActivity extends Activity {
 								Map<String, Object> info) {
 							// TODO Auto-generated method stub
 							if (info != null) {
+								Log.i("cc", info.toString());
 								Toast.makeText(MainActivity.this,
 										info.toString(), Toast.LENGTH_SHORT)
 										.show();
@@ -675,7 +727,8 @@ public class MainActivity extends Activity {
 										int which) {
 									Intent intent = new Intent();
 									intent.setAction("android.intent.action.VIEW");
-									Uri content_url = Uri.parse(info.getUrl());
+									Uri content_url = Uri
+											.parse(Config.APP_DOWNLOAD_URL);
 									intent.setData(content_url);
 									startActivity(intent);
 								}
@@ -751,6 +804,28 @@ public class MainActivity extends Activity {
 		conn.disconnect(); // 断开连接
 		return null;
 
+	}
+
+	public InputStream getUpdateServerAppVersionCodeJson() throws Exception {
+		String httpUrl = Config.UPDATE_APP_CODE_URL; // 服务器下存放apk信息的api接口
+		HttpURLConnection conn = (HttpURLConnection) new URL(httpUrl)
+				.openConnection();
+
+		Log.i("cc", "--连接服务器中...--" + httpUrl);
+		conn.setReadTimeout(5000); // 设置连接超时的时间
+		// conn.setRequestMethod("GET");
+		conn.connect(); // 开始连接
+		Log.i("cc", "--开始连接--");
+
+		if (conn.getResponseCode() == 200) {
+			InputStream is = conn.getInputStream();
+			Log.i("cc", "--连接服务器成功--");
+			return is; // 返回InputStream
+		} else {
+			Log.i("cc", "---连接失败,即将断开连接---");
+		}
+		conn.disconnect(); // 断开连接
+		return null;
 	}
 
 	/**

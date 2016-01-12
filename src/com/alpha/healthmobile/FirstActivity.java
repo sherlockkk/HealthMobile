@@ -172,8 +172,11 @@ public class FirstActivity extends Activity implements AMapLocationListener {
 			// 定位成功回调信息，设置相关消息
 			// postLocation(amapLocation.getLatitude() + ","
 			// + amapLocation.getLongitude());
-			Config.lnglat = amapLocation.getLatitude() + ","
-					+ amapLocation.getLongitude();
+			Config.lnglat = amapLocation.getLongitude() + ","
+					+ amapLocation.getLatitude();
+			Log.i("Amap",
+					amapLocation.getLongitude() + ","
+							+ amapLocation.getLatitude());
 		} else {
 			Log.e("AmapErr", "Location ERR:"
 					+ amapLocation.getAMapException().getErrorCode());

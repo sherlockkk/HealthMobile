@@ -63,11 +63,7 @@ public class AliPay {
 		return orderInfo;
 	}
 
-	/**
-	 * get the out_trade_no for an order. 生成商户订单号，该值在商户端应保持唯一（可自定义格式规范）
-	 * 
-	 */
-	public String getOutTradeNo() {
+	public String getTradNo() {
 		SimpleDateFormat format = new SimpleDateFormat("MMddHHmmss",
 				Locale.getDefault());
 		Date date = new Date();
@@ -77,6 +73,14 @@ public class AliPay {
 		key = key + r.nextInt();
 		key = key.substring(0, 15);
 		return key;
+	}
+
+	/**
+	 * get the out_trade_no for an order. 生成商户订单号，该值在商户端应保持唯一（可自定义格式规范）
+	 * 
+	 */
+	public String getOutTradeNo() {
+		return getTradNo();
 	}
 
 	/**

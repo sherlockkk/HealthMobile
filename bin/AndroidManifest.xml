@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.alpha.healthmobile"
-    android:versionCode="9"
-    android:versionName="1.1.4" >
+    android:versionCode="17"
+    android:versionName="1.2.0" >
 
     <uses-sdk
         android:minSdkVersion="8"
@@ -32,7 +32,7 @@
         android:theme="@android:style/Theme.Light.NoTitleBar" >
         <meta-data
             android:name="com.amap.api.v2.apikey"
-            android:value="70aeb8d175d6f8ad0d48f741fdf50272" />
+            android:value="a6ec1b65db5f6f51648d2f08ef9cb8dd" />
 
         <activity
             android:name="com.alpha.healthmobile.FirstActivity"
@@ -52,7 +52,7 @@
             android:screenOrientation="portrait" >
             <intent-filter >
                 <!-- scheme的值即为微信支付的appId -->
-                <data android:scheme="wx4fec9e44be45c0cd"/>
+                <data android:scheme="wxd3c037fb929ddcf7"/>
             </intent-filter>
         </activity>
         
@@ -65,7 +65,7 @@
             <intent-filter>
                 <action android:name="android.intent.action.VIEW"/>
                 <category android:name="android.intent.category.DEFAULT"/>
-                <data android:scheme="wx4fec9e44be45c0cd"/> <!-- 需修改 -->
+                <data android:scheme="wxd3c037fb929ddcf7"/> <!-- 需修改 -->
             </intent-filter>
         </activity>
 
@@ -206,7 +206,7 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
                 <!-- 100424468，如果你使用的公用账号，则不需要修改；否则修改成你在QQ开放平台申请的 APP ID-->
-                <data android:scheme="tencent1105010560" /> 
+                <data android:scheme="tencent1104732813" /> 
             </intent-filter>
         </activity>
         <activity android:name="com.tencent.connect.common.AssistActivity"
